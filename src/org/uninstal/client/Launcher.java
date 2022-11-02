@@ -1,11 +1,12 @@
 package org.uninstal.client;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.uninstal.client.minecraft.Minecraft;
 import org.uninstal.client.util.Paths;
 
 import java.net.URL;
@@ -13,8 +14,10 @@ import java.util.Objects;
 
 public class Launcher extends Application {
   
+  private static Minecraft minecraft;
   private static Stage stage;
-  private static Scene scene;
+  private static Scene authScene;
+  private static Scene playScene;
 
   public static void main(String[] args) {
     launch();
@@ -25,36 +28,65 @@ public class Launcher extends Application {
     // BufferedImage image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
     // ImageIO.write(image, "png", new File(Paths.getHomeLocation() + "/screenshot.png"));
     
+    // Избегание завершения потока сцен.
+    Platform.setImplicitExit(false);
+    
     stage = primaryStage;
-    URL fxmlFileUrl = Paths.getUrl("/assets/launcher.fxml");
-    if (fxmlFileUrl == null) {
-      System.out.println("File of launcher.fxml is null");
+    URL authScene = Paths.getUrl("/assets/auth.fxml");
+    URL playScene = Paths.getUrl("/assets/play.fxml");
+    if (authScene == null || playScene == null) {
+      System.out.println("File broken.");
       System.exit(0);
       return;
     }
-    Parent root = FXMLLoader.load(fxmlFileUrl);
-    scene = new Scene(root);
+    
+    Launcher.authScene = new Scene(FXMLLoader.load(authScene));
+    Launcher.playScene = new Scene(FXMLLoader.load(playScene));
     primaryStage.setTitle("NDAZ Official Launcher ©");
-    primaryStage.setScene(scene);
+    primaryStage.setScene(Launcher.authScene);
     primaryStage.getIcons().add(new Image(Objects.requireNonNull(Launcher.class.getResourceAsStream("/assets/icon.png"))));
     primaryStage.show();
-    primaryStage.setOnCloseRequest(e -> Client.getConnection().disconnect());
+    primaryStage.setOnCloseRequest(e -> {
+      Client.getConnection().disconnect();
+      Platform.exit();
+    });
     Client.main();
   }
   
+  public static void launchMinecraft(String nickname) {
+    if (isMinecraftLaunched()) return;
+    minecraft = new Minecraft(nickname);
+    minecraft.launch();
+  }
+  
   public static void hide() {
-    stage.close();
+    Platform.runLater(() -> stage.hide());
   }
   
   public static void show() {
-    stage.show();
+    Platform.runLater(() -> stage.show());
+  }
+  
+  public static boolean isShowing() {
+    return stage.isShowing();
   }
 
-  public static Scene getScene() {
-    return scene;
+  public static Minecraft getMinecraft() {
+    return minecraft;
+  }
+  
+  public static boolean isMinecraftLaunched() {
+    return minecraft != null;
+  }
+  
+  public static void onMinecraftClosed() {
+    minecraft = null;
   }
 
-  public static Stage getStage() {
-    return stage;
+  public static void showPlayScene() {
+    Platform.runLater(() -> {
+      stage.setScene(playScene);
+      stage.show();
+    });
   }
 }

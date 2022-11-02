@@ -9,24 +9,22 @@ import org.uninstal.client.connection.download.DownloadProcess;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class PacketDownloadFile extends Packet implements PacketReceivable {
 
   public PacketDownloadFile(Connection connection) {
     super(connection, PacketType.DOWNLOAD_FILE);
   }
-
+  
   @Override
-  public void receive(InputStream input) throws IOException {
-    DataInputStream data = new DataInputStream(input);
-    int processId = data.readInt();
+  public void receive(DataInputStream input) throws IOException {
+    int processId = input.readInt();
     DownloadProcess process = Client.getConnection().getDownloadProcess(processId);
     
     if (process != null) {
-      String folder = data.readUTF();
-      String fileName = data.readUTF();
-      process.buildFile(data, folder, fileName);
+      String folder = input.readUTF();
+      String fileName = input.readUTF();
+      process.buildFile(input, folder, fileName);
     }
   }
 }

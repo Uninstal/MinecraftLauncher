@@ -1,11 +1,14 @@
 package org.uninstal.client.connection.download;
 
-import org.uninstal.client.fxml.FxmlController;
 import org.uninstal.client.util.Paths;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class DownloadProcess {
   
@@ -27,7 +30,6 @@ public class DownloadProcess {
     this.failedFiles = 0;
     this.currentFile = "null";
     this.currentFilePersent = 0;
-    FxmlController.getProgressBarController().setText("Установка клиента...");
   }
 
   public int getProcessId() {
@@ -71,6 +73,28 @@ public class DownloadProcess {
         
         System.out.println("Создан файл " + folder + "/" + fileName);
         downloadedFiles++;
+
+        if (file.getName().equalsIgnoreCase("game.rar")) {
+          try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+              File target = new File(path, entry.getName());
+
+              if (entry.isDirectory())
+                target.mkdirs();
+              else {
+                Path targetPath = target.toPath();
+                Files.createDirectory(targetPath.getParent());
+                Files.copy(zis, targetPath);
+              }
+            }
+            System.out.println("Архив " + file.getName() + " распакован");
+            file.delete();
+          } catch(Exception e) {
+            System.out.println("Ошибка при распаковке архива:");
+            e.printStackTrace();
+          }
+        }
         
       } else skippedFiles++;
       
@@ -92,6 +116,5 @@ public class DownloadProcess {
     double time = (System.currentTimeMillis() - start) / 1000d;
     System.out.println("Скачано " + totalFiles + " файлов " +
       "(" + downloadedFiles + " успешно, " + skippedFiles + " пропущено, " + failedFiles + " неудачно) за " + time + " с.");
-    FxmlController.getProgressBarController().disable();
   }
 }

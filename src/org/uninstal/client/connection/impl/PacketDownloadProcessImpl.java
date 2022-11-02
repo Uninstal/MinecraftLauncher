@@ -16,11 +16,9 @@ public class PacketDownloadProcessImpl extends Packet implements PacketReceivabl
   }
 
   @Override
-  public void receive(InputStream input) throws IOException {
-    
-    DataInputStream data = new DataInputStream(input);
-    int proccessId = data.readInt();
-    int totalFiles = data.readInt();
+  public void receive(DataInputStream input) throws IOException {
+    int proccessId = input.readInt();
+    int totalFiles = input.readInt();
     getConnection().createDownloadProccess(proccessId, totalFiles);
   }
 }

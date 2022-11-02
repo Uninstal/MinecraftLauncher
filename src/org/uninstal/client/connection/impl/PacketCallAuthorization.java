@@ -11,19 +11,19 @@ import java.io.OutputStream;
 
 public class PacketCallAuthorization extends Packet implements PacketSentable {
   
-  private String login;
-  private String password;
+  private final String login;
+  private final String password;
   
   public PacketCallAuthorization(Connection connection, String login, String password) {
     super(connection, PacketType.CALL_AUTHORIZATION);
+    this.login = login;
+    this.password = password;
   }
   
   @Override
-  public void send(OutputStream output) throws IOException {
-    DataOutputStream data = new DataOutputStream(output);
-    data.writeUTF(getType().getName());
-    data.writeUTF(login);
-    data.writeUTF(password);
-    data.flush();
+  public void send(DataOutputStream output) throws IOException {
+    output.writeUTF(login);
+    output.writeUTF(password);
+    output.flush();
   }
 }

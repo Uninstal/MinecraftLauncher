@@ -7,25 +7,12 @@ import java.util.function.Consumer;
 
 public class MinecraftMonitor {
   
-  private final BufferedReader logger;
-  private final BufferedReader error;
-  
   public MinecraftMonitor(InputStream logger, InputStream error) {
-    this.logger = new BufferedReader(new InputStreamReader(logger));
-    this.error = new BufferedReader(new InputStreamReader(error));
-    infinity("MinecraftLogger",this.logger, System.out::println);
-    infinity("MinecraftReporter", this.error, System.out::println);
-  }
-
-  public BufferedReader getErrorStream() {
-    return error;
-  }
-
-  public BufferedReader getLoggerStream() {
-    return logger;
+    infinityReader("MinecraftLogger", new BufferedReader(new InputStreamReader(logger)), System.out::println);
+    infinityReader("MinecraftReporter", new BufferedReader(new InputStreamReader(error)), System.out::println);
   }
   
-  private void infinity(String id, BufferedReader reader, Consumer<String> action) {
+  private void infinityReader(String id, BufferedReader reader, Consumer<String> action) {
     try {
       String line;
       while ((line = reader.readLine()) != null)

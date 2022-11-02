@@ -7,10 +7,7 @@ import org.uninstal.client.connection.impl.PacketDownloadProcessDown;
 import org.uninstal.client.connection.impl.PacketDownloadProcessImpl;
 import org.uninstal.client.connection.impl.PacketResultAuthorization;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashMap;
@@ -26,8 +23,8 @@ public class Connection {
   private int attempts;
   private Thread thread;
   private Socket socket;
-  private InputStream input;
-  private OutputStream output;
+  private DataInputStream input;
+  private DataOutputStream output;
   
   public Connection(String ip, int port) {
     this.attempts = 0;
@@ -41,49 +38,47 @@ public class Connection {
 
   public void tryConnect(Consumer<Boolean> state) {
     new Thread(() -> {
-      while (!isConnected() && Launcher.getStage().isShowing()) {
+      while (!isConnected() && Launcher.isShowing()) {
+        attempts++;
         try {
           this.socket = new Socket();
           this.socket.connect(new InetSocketAddress(ip, port), 1500);
-          this.input = socket.getInputStream();
-          this.output = socket.getOutputStream();
+          this.input = new DataInputStream(socket.getInputStream());
+          this.output = new DataOutputStream(socket.getOutputStream());
           state.accept(true);
         } catch (Exception e) {
           state.accept(false);
         }
-        attempts++;
       }
     }, "Connecting").start();
   }
   
   public void runThread() {
-    if (socket == null || !socket.isConnected() || socket.isClosed()) {
-      System.out.println("Failed to run connection thread!");
-      System.out.println("Socket: " + socket);
-      System.out.println("Connected: " + (socket != null && socket.isConnected()));
-      System.out.println("Closed: " + (socket != null && socket.isClosed()));
-      return;
-    }
-    this.thread = new Thread(() -> {
-      System.out.println(321);
-      while (!thread.isInterrupted()) {
-        
-        try {
-          Packet packet = readPacket();
-          if(packet != null) {
-            try {
-              ((PacketReceivable) packet).receive(input);
-            } catch(Exception e) {
-              // Пакет не был прочитан
+    if (!isConnected())
+      System.out.println("Could not start ConnectionThread because socket is not connected");
+    else if (thread != null && !thread.isInterrupted())
+      System.out.println("Could not start ConnectionThread because it is already running");
+    else {
+      this.thread = new Thread(() -> {
+        while (!thread.isInterrupted() && isConnected()) {
+          try {
+            Packet packet = readPacket();
+            if(packet != null) {
+              try {
+                ((PacketReceivable) packet).receive(input);
+              } catch(Exception ignored) {
+                System.out.println("Packet " + packet.getType() + " was not read");
+              }
             }
+          } catch (Exception e) {
+            disconnect();
+            return;
           }
-        } catch (Exception e) {
-          disconnect();
-          return;
         }
-      }
-    });
-    this.thread.start();
+        System.out.println("ConnectionThread has finished work");
+      }, "ConnectionThread");
+      this.thread.start();
+    }
   }
   
   public void disconnect() {
@@ -110,26 +105,28 @@ public class Connection {
       downloadProcessMap.remove(id).down();
   }
   
-  public void sendPacket(PacketSentable packet) {
+  public void sendPacket(Packet packet) {
     try {
-      packet.send(output);
+      if (!(packet instanceof PacketSentable))
+        throw new IllegalArgumentException("Packet " + packet + " is not sentable");
+      output.writeUTF(packet.getType().getName());
+      ((PacketSentable) packet).send(output);
     } catch(IOException e) {
       disconnect();
     }
   }
   
   private Packet readPacket() {
-    
     try {
-      
       DataInputStream data = new DataInputStream(input);
+      if (data.available() == 0) return null;
       String packetName = data.readUTF();
       PacketType packetType;
       
       try {
         packetType = PacketType.valueOf(packetName.toUpperCase());
       } catch(Exception e) {
-        System.out.println("Неизвестный тип пакета: " + packetName);
+        System.out.println("Unknown packet type: " + packetName);
         return null;
       }
       
@@ -137,7 +134,6 @@ public class Connection {
       else if (packetType == PacketType.DOWNLOAD_PROCESS_IMPL) return new PacketDownloadProcessImpl(this);
       else if (packetType == PacketType.DOWNLOAD_FILE) return new PacketDownloadFile(this);
       else if (packetType == PacketType.DOWNLOAD_PROCESS_DOWN) return new PacketDownloadProcessDown(this);
-      else return null;
       
     } catch (Exception e) {
       e.printStackTrace();
@@ -147,23 +143,7 @@ public class Connection {
     return null;
   }
   
-  public InputStream getInputStream() {
-    return input;
-  }
-
-  public OutputStream getOutputStream() {
-    return output;
-  }
-
-  public int getPort() {
-    return port;
-  }
-
-  public String getIp() {
-    return ip;
-  }
-  
   public boolean isConnected() {
-    return socket != null && socket.isConnected();
+    return socket != null && socket.isConnected() && !socket.isClosed();
   }
 }

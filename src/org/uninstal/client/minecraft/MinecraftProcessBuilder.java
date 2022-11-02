@@ -9,7 +9,7 @@ public class MinecraftProcessBuilder {
   private final StringBuilder argsBuilder = new StringBuilder();
 
   /**
-   * @param arg аргумент запуска, который отделяется проблем от других.
+   * @param arg аргумент запуска, который отделяется специальным символом от других.
    * @return метод возвращает данный класс.
    */
   public MinecraftProcessBuilder append(String arg) {
@@ -18,8 +18,8 @@ public class MinecraftProcessBuilder {
   }
 
   /**
-   * Необходимо выполнять в отдельном потоке, чтобы главный поток не завис.
-   * Сделано отключение входящих потоков для того, чтобы не зависал процесс запуска.
+   * Необходимо выполнять в отдельном потоке, чтобы избежать возможных зависаний.
+   * Входящие потоки теперь обрабатываются в классе MinecraftMonitor.
    */
   public Process start() {
     String[] args = argsBuilder.toString().split(separator);

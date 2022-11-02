@@ -17,4 +17,9 @@ public class Packet {
   public PacketType getType() {
     return packetType;
   }
+
+  @Override
+  public String toString() {
+    return "[type=" + packetType.getName() + "]";
+  }
 }
