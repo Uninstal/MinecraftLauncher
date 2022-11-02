@@ -12,11 +12,11 @@ import org.uninstal.client.fxml.PlayScene;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class PacketResultAuthorization extends Packet implements PacketReceivable {
+public class PacketAuthorizationResult extends Packet implements PacketReceivable {
   
   private AuthorizationResult result;
   
-  public PacketResultAuthorization(Connection connection) {
+  public PacketAuthorizationResult(Connection connection) {
     super(connection, PacketType.RESULT_AUTHORIZATION);
   }
   

@@ -1,5 +1,6 @@
 package org.uninstal.client.fxml;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -32,5 +33,17 @@ public class PlayScene {
 
   public static PlayScene getInstance() {
     return instance;
+  }
+
+  public synchronized void showError(String text) {
+    Platform.runLater(() -> {
+      ERROR_AREA.setText(text);
+      ERROR_AREA.setVisible(true);
+    });
+  }
+
+  public synchronized void hideErrors() {
+    Platform.runLater(() ->
+      ERROR_AREA.setVisible(false));
   }
 }
