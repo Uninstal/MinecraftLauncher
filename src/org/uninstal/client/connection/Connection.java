@@ -2,10 +2,7 @@ package org.uninstal.client.connection;
 
 import org.uninstal.client.Launcher;
 import org.uninstal.client.connection.download.DownloadProcess;
-import org.uninstal.client.connection.impl.PacketDownloadFile;
-import org.uninstal.client.connection.impl.PacketDownloadProcessDown;
-import org.uninstal.client.connection.impl.PacketDownloadProcessImpl;
-import org.uninstal.client.connection.impl.PacketResultAuthorization;
+import org.uninstal.client.connection.impl.*;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -130,10 +127,11 @@ public class Connection {
         return null;
       }
       
-      if (packetType == PacketType.RESULT_AUTHORIZATION) return new PacketResultAuthorization(this);
+      if (packetType == PacketType.RESULT_AUTHORIZATION) return new PacketAuthorizationResult(this);
       else if (packetType == PacketType.DOWNLOAD_PROCESS_IMPL) return new PacketDownloadProcessImpl(this);
       else if (packetType == PacketType.DOWNLOAD_FILE) return new PacketDownloadFile(this);
       else if (packetType == PacketType.DOWNLOAD_PROCESS_DOWN) return new PacketDownloadProcessDown(this);
+      else if (packetType == PacketType.CLIENT_RESOURCES_RESULT) return new PacketClientResourcesResult(this);
       
     } catch (Exception e) {
       e.printStackTrace();
