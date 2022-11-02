@@ -73,27 +73,29 @@ public class DownloadProcess {
         
         System.out.println("Создан файл " + folder + "/" + fileName);
         downloadedFiles++;
-
+        
         if (file.getName().equalsIgnoreCase("game.rar")) {
           try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
               File target = new File(path, entry.getName());
-
-              if (entry.isDirectory())
-                target.mkdirs();
-              else {
-                Path targetPath = target.toPath();
-                Files.createDirectory(targetPath.getParent());
-                Files.copy(zis, targetPath);
+              
+              if (!target.exists()) {
+                if (entry.isDirectory())
+                  target.mkdirs();
+                else {
+                  Path targetPath = target.toPath();
+                  Files.createDirectory(targetPath.getParent());
+                  Files.copy(zis, targetPath);
+                }
               }
             }
             System.out.println("Архив " + file.getName() + " распакован");
-            file.delete();
           } catch(Exception e) {
             System.out.println("Ошибка при распаковке архива:");
             e.printStackTrace();
           }
+          file.delete();
         }
         
       } else skippedFiles++;
