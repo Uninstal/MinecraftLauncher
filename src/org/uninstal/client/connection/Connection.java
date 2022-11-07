@@ -2,10 +2,7 @@ package org.uninstal.client.connection;
 
 import org.uninstal.client.Launcher;
 import org.uninstal.client.connection.download.DownloadProcess;
-import org.uninstal.client.connection.impl.PacketDownloadFile;
-import org.uninstal.client.connection.impl.PacketDownloadProcessDown;
-import org.uninstal.client.connection.impl.PacketDownloadProcessImpl;
-import org.uninstal.client.connection.impl.PacketResultAuthorization;
+import org.uninstal.client.connection.impl.*;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -118,23 +115,24 @@ public class Connection {
   
   private Packet readPacket() {
     try {
-      DataInputStream data = new DataInputStream(input);
-      if (data.available() == 0) return null;
-      String packetName = data.readUTF();
+      String packetName = input.readUTF();
       PacketType packetType;
-      
+
       try {
         packetType = PacketType.valueOf(packetName.toUpperCase());
       } catch(Exception e) {
         System.out.println("Unknown packet type: " + packetName);
         return null;
       }
-      
-      if (packetType == PacketType.RESULT_AUTHORIZATION) return new PacketResultAuthorization(this);
+
+      System.out.println(packetType.getName());
+      if (packetType == PacketType.RESULT_AUTHORIZATION) return new PacketAuthorizationResult(this);
       else if (packetType == PacketType.DOWNLOAD_PROCESS_IMPL) return new PacketDownloadProcessImpl(this);
       else if (packetType == PacketType.DOWNLOAD_FILE) return new PacketDownloadFile(this);
       else if (packetType == PacketType.DOWNLOAD_PROCESS_DOWN) return new PacketDownloadProcessDown(this);
+      else if (packetType == PacketType.CLIENT_RESOURCES_RESULT) return new PacketClientResourcesResult(this);
       
+    } catch (IOException ignored) {
     } catch (Exception e) {
       e.printStackTrace();
       disconnect();

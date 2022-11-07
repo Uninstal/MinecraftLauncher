@@ -5,16 +5,23 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
+import org.uninstal.client.fxml.AuthScene;
+import org.uninstal.client.fxml.PlayScene;
 import org.uninstal.client.minecraft.Minecraft;
 import org.uninstal.client.util.Paths;
 
+import java.awt.*;
 import java.net.URL;
 import java.util.Objects;
 
 public class Launcher extends Application {
   
   private static Minecraft minecraft;
+  private static double width;
+  private static double height;
   private static Stage stage;
   private static Scene authScene;
   private static Scene playScene;
@@ -32,16 +39,23 @@ public class Launcher extends Application {
     Platform.setImplicitExit(false);
     
     stage = primaryStage;
-    URL authScene = Paths.getUrl("/assets/auth.fxml");
-    URL playScene = Paths.getUrl("/assets/play.fxml");
-    if (authScene == null || playScene == null) {
+    URL authSceneURL = Paths.getUrl("/assets/auth.fxml");
+    URL playSceneURL = Paths.getUrl("/assets/play.fxml");
+    if (authSceneURL == null || playSceneURL == null) {
       System.out.println("File broken.");
       System.exit(0);
       return;
     }
     
-    Launcher.authScene = new Scene(FXMLLoader.load(authScene));
-    Launcher.playScene = new Scene(FXMLLoader.load(playScene));
+    authScene = new Scene(FXMLLoader.load(authSceneURL));
+    playScene = new Scene(FXMLLoader.load(playSceneURL));
+    // Создание масштабированного разрешения для монитора пользователя.
+    createScaling();
+    // Применяем масштабирование к сценам.
+    applyScaling(AuthScene.getInstance().BOX);
+    applyScaling(PlayScene.getInstance().BOX);
+    
+    primaryStage.setResizable(false);
     primaryStage.setTitle("NDAZ Official Launcher ©");
     primaryStage.setScene(Launcher.authScene);
     primaryStage.getIcons().add(new Image(Objects.requireNonNull(Launcher.class.getResourceAsStream("/assets/icon.png"))));
@@ -54,9 +68,10 @@ public class Launcher extends Application {
   }
   
   public static void launchMinecraft(String nickname) {
-    if (isMinecraftLaunched()) return;
-    minecraft = new Minecraft(nickname);
-    minecraft.launch();
+    if (!isMinecraftLaunched()) {
+      minecraft = new Minecraft(nickname);
+      minecraft.launch();
+    }
   }
   
   public static void hide() {
@@ -88,5 +103,26 @@ public class Launcher extends Application {
       stage.setScene(playScene);
       stage.show();
     });
+  }
+
+  /**
+   * Инициализация размеров окна лаунчера под разные разрешения.
+   * Цифры были вычислены опытным путем для правильного соотношения сторон.
+   */
+  private static void createScaling() {
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    width = Math.floor(screenSize.width / 1.875);
+    height = Math.floor(screenSize.height / 1.8685121107266435986159169550173);
+    System.out.println("Laucnher screen size: " + ((int) width) + "x" + ((int) height));
+  }
+
+  /**
+   * Применение размеров к указанному окну.
+   */
+  private static void applyScaling(Pane pane) {
+    pane.getTransforms().setAll(new Scale(width / 1024d, height / 578d, 0d, 0d));
+    pane.setMinSize(0d, 0d);
+    pane.setMaxSize(9999d, 9999d);
+    pane.setPrefSize(width, height);
   }
 }

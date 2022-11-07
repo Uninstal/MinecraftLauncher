@@ -19,8 +19,7 @@ public class PacketClientResourcesResult extends Packet implements PacketReceiva
 
   @Override
   public void receive(DataInputStream input) throws IOException {
-    boolean valid = input.readBoolean();
-    if (valid) {
+    if (input.readBoolean()) {
       Launcher.launchMinecraft(Client.getNickname());
       Launcher.hide();
     } else {

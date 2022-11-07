@@ -9,6 +9,7 @@ import org.uninstal.client.util.Paths;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class PacketClientResourses extends Packet implements PacketSentable {
   
@@ -18,8 +19,16 @@ public class PacketClientResourses extends Packet implements PacketSentable {
   
   @Override
   public void send(DataOutputStream output) throws IOException {
-    for (File file : Paths.getFiles(Paths.getHomeLocation()))
+    String home = Paths.getHomeLocation();
+    List<File> files = Paths.getFiles(home);
+    
+    output.writeInt(files.size());
+    for (File file : files) {
+      String folder = file.getParent().length() < home.length() ? "" : file.getParent().substring(home.length());
+      output.writeUTF(folder);
       output.writeUTF(file.getName());
+      output.writeLong(file.length());
+    }
     output.flush();
   }
 }

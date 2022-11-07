@@ -5,10 +5,7 @@ import org.uninstal.client.util.Paths;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.io.IOException;
 
 public class DownloadProcess {
   
@@ -20,7 +17,6 @@ public class DownloadProcess {
   private int skippedFiles;
   private int failedFiles;
   private String currentFile;
-  private int currentFilePersent;
   
   public DownloadProcess(int processId, int totalFiles) {
     this.processId = processId;
@@ -29,7 +25,6 @@ public class DownloadProcess {
     this.skippedFiles = 0;
     this.failedFiles = 0;
     this.currentFile = "null";
-    this.currentFilePersent = 0;
   }
 
   public int getProcessId() {
@@ -52,66 +47,45 @@ public class DownloadProcess {
     return totalFiles;
   }
   
-  public synchronized void buildFile(DataInputStream input, String folder, String fileName) {
+  public void buildFile(DataInputStream input, String folder, String fileName) throws IOException {
+    
     String path = Paths.getHomeLocation() + folder;
     new File(path).mkdirs();
     File file = new File(path, fileName);
+    int length = input.readInt();
     
-    try (FileOutputStream fileOutput = new FileOutputStream(file)) {
-      if (!file.exists()) {
+    if (!file.exists()) {
+      try (FileOutputStream fileOutput = new FileOutputStream(file)) {
         currentFile = fileName;
         
-        int lengthTemp = input.readInt();
-        byte[] array = new byte[8096];
-        while (lengthTemp > 0) {
-          int read = input.read(array);
-          fileOutput.write(array, 0, read);
-          fileOutput.flush();
-          lengthTemp -= read;
-          currentFilePersent = 100 - (int) ((lengthTemp * 100) / file.length());
+        byte[] array = new byte[length];
+        int read = 0;
+        while (read < length) {
+          read += input.read(array, read, length - read);
         }
-        
-        System.out.println("Создан файл " + folder + "/" + fileName);
+        fileOutput.write(array);
+        fileOutput.flush();
+
+        //System.out.println("Создан файл " + folder + "/" + fileName);
         downloadedFiles++;
-        
-        if (file.getName().equalsIgnoreCase("game.rar")) {
-          try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
-              File target = new File(path, entry.getName());
-              
-              if (!target.exists()) {
-                if (entry.isDirectory())
-                  target.mkdirs();
-                else {
-                  Path targetPath = target.toPath();
-                  Files.createDirectory(targetPath.getParent());
-                  Files.copy(zis, targetPath);
-                }
-              }
-            }
-            System.out.println("Архив " + file.getName() + " распакован");
-          } catch(Exception e) {
-            System.out.println("Ошибка при распаковке архива:");
-            e.printStackTrace();
-          }
-          file.delete();
-        }
-        
-      } else skippedFiles++;
-      
-    } catch(Exception e) {
-      e.printStackTrace();
-      failedFiles++;
+
+      } catch(Exception e) {
+        e.printStackTrace();
+        failedFiles++;
+      }
+
+    } else {
+      input.skipBytes(length);
+      skippedFiles++;
     }
   }
 
   public String getCurrentFile() {
     return currentFile;
   }
-
-  public int getCurrentFilePersent() {
-    return currentFilePersent;
+  
+  public int getReadedFilesCount() {
+    return totalFiles - downloadedFiles - failedFiles - skippedFiles;
   }
 
   public void down() {

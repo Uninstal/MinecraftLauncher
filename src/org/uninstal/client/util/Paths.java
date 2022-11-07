@@ -37,6 +37,7 @@ public class Paths {
   }
 
   public static List<File> getFiles(String folderPath) {
+    System.out.println(folderPath);
     return getFiles(new File(folderPath));
   }
 
@@ -49,7 +50,7 @@ public class Paths {
           files.addAll(getFiles(file));
         } else files.add(file);
       }
-    }
+    } else System.out.println("Folder or files in folder is empty");
     return files;
   }
   

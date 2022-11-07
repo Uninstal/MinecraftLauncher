@@ -58,7 +58,8 @@ public class Minecraft {
   
   private void appendClasspath(MinecraftProcessBuilder b) {
     String path = Paths.getHomeLocation() + "/";
-    String cp = "libraries/com/turikhay/ca-fixer/1.0/ca-fixer-1.0.jar;" +
+    String cp = "libraries/com/mojang/authlib/1.5.25/authlib-1.5.25.jar;" +
+      "libraries/com/turikhay/ca-fixer/1.0/ca-fixer-1.0.jar;" +
       "libraries/net/minecraftforge/forge/1.12.2-14.23.5.2860/forge-1.12.2-14.23.5.2860.jar;" +
       "libraries/org/ow2/asm/asm-debug-all/5.2/asm-debug-all-5.2.jar;" +
       "libraries/net/minecraft/launchwrapper/1.12/launchwrapper-1.12.jar;" +
