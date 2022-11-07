@@ -52,13 +52,14 @@ public class Launcher extends Application {
     // Создание масштабированного разрешения для монитора пользователя.
     createScaling();
     // Применяем масштабирование к сценам.
-    applyScaling(AuthScene.getInstance().BOX);
-    applyScaling(PlayScene.getInstance().BOX);
+    applyScaling(AuthScene.getInstance().PANE);
+    applyScaling(PlayScene.getInstance().PANE);
     
-    primaryStage.setResizable(false);
     primaryStage.setTitle("NDAZ Official Launcher ©");
     primaryStage.setScene(Launcher.authScene);
     primaryStage.getIcons().add(new Image(Objects.requireNonNull(Launcher.class.getResourceAsStream("/assets/icon.png"))));
+    primaryStage.setResizable(false);
+    primaryStage.sizeToScene();
     primaryStage.show();
     primaryStage.setOnCloseRequest(e -> {
       Client.getConnection().disconnect();
@@ -111,8 +112,8 @@ public class Launcher extends Application {
    */
   private static void createScaling() {
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    width = Math.floor(screenSize.width / 1.875);
-    height = Math.floor(screenSize.height / 1.8685121107266435986159169550173);
+    width = Math.floor(screenSize.width / 2d);
+    height = Math.floor(screenSize.height / 2d);
     System.out.println("Laucnher screen size: " + ((int) width) + "x" + ((int) height));
   }
 
@@ -120,7 +121,7 @@ public class Launcher extends Application {
    * Применение размеров к указанному окну.
    */
   private static void applyScaling(Pane pane) {
-    pane.getTransforms().setAll(new Scale(width / 1024d, height / 578d, 0d, 0d));
+    pane.getTransforms().setAll(new Scale(width / 960d, height / 540d, 0d, 0d));
     pane.setMinSize(0d, 0d);
     pane.setMaxSize(9999d, 9999d);
     pane.setPrefSize(width, height);

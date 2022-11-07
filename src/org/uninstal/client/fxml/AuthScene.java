@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import org.uninstal.client.Client;
 import org.uninstal.client.connection.Connection;
 import org.uninstal.client.connection.impl.PacketCallAuthorization;
@@ -13,7 +12,6 @@ public class AuthScene {
 
   private static AuthScene instance;
   
-  @FXML public VBox BOX;
   @FXML public AnchorPane PANE;
   @FXML public Button LOGIN_BUTTON;
   @FXML public PasswordField PASSWORD_AREA;
@@ -23,8 +21,6 @@ public class AuthScene {
   @FXML
   void initialize() {
     instance = this;
-    PANE.prefWidthProperty().bind(BOX.prefWidthProperty());
-    PANE.prefHeightProperty().bind(BOX.prefHeightProperty());
     
     LOGIN_BUTTON.setOnAction(event -> {
       if (!Client.isConnected()) {
