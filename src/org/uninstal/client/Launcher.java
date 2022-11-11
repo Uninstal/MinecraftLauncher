@@ -68,7 +68,7 @@ public class Launcher extends Application {
     Client.main();
   }
   
-  public static void launchMinecraft(String nickname) {
+  public static synchronized void launchMinecraft(String nickname) {
     if (!isMinecraftLaunched()) {
       minecraft = new Minecraft(nickname);
       minecraft.launch();

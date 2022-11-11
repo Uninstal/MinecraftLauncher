@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import org.uninstal.client.Client;
 import org.uninstal.client.connection.Connection;
 import org.uninstal.client.connection.impl.PacketCallAuthorization;
@@ -11,12 +12,13 @@ import org.uninstal.client.connection.impl.PacketCallAuthorization;
 public class AuthScene {
 
   private static AuthScene instance;
+  private long lock = System.currentTimeMillis();
   
-  @FXML public AnchorPane PANE;
-  @FXML public Button LOGIN_BUTTON;
-  @FXML public PasswordField PASSWORD_AREA;
-  @FXML public TextField LOGIN_AREA;
-  @FXML public Label ERROR_AREA;
+  public AnchorPane PANE;
+  public Button LOGIN_BUTTON;
+  public PasswordField PASSWORD_AREA;
+  public TextField LOGIN_AREA;
+  public Label ERROR_AREA;
 
   @FXML
   void initialize() {
@@ -25,6 +27,7 @@ public class AuthScene {
     LOGIN_BUTTON.setOnAction(event -> {
       if (!Client.isConnected()) {
         showError("Отсутствует подключение к серверу авторизации...");
+        lock(5000L);
         return;
       }
       
@@ -39,13 +42,30 @@ public class AuthScene {
   }
 
   public synchronized void showError(String text) {
-    Platform.runLater(() -> {
-      ERROR_AREA.setText(text);
-      ERROR_AREA.setVisible(true);
-    });
+    if (lock < System.currentTimeMillis()) {
+      Platform.runLater(() -> {
+        ERROR_AREA.setTextFill(Color.RED);
+        ERROR_AREA.setText(text);
+        ERROR_AREA.setVisible(true);
+      });
+    }
+  }
+
+  public synchronized void showStatus(String text) {
+    if (lock < System.currentTimeMillis()) {
+      Platform.runLater(() -> {
+        ERROR_AREA.setTextFill(Color.WHITE);
+        ERROR_AREA.setText(text);
+        ERROR_AREA.setVisible(true);
+      });
+    }
   }
   
-  public synchronized void hideErrors() {
+  public synchronized void lock(long millis) {
+    this.lock = System.currentTimeMillis() + millis;
+  }
+  
+  public synchronized void hideText() {
     Platform.runLater(() -> 
       ERROR_AREA.setVisible(false));
   }

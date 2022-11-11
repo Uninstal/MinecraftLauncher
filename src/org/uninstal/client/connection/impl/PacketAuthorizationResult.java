@@ -7,7 +7,6 @@ import org.uninstal.client.connection.Packet;
 import org.uninstal.client.connection.PacketReceivable;
 import org.uninstal.client.connection.PacketType;
 import org.uninstal.client.fxml.AuthScene;
-import org.uninstal.client.fxml.PlayScene;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -37,14 +36,11 @@ public class PacketAuthorizationResult extends Packet implements PacketReceivabl
     
     AuthScene fxml = AuthScene.getInstance();
     if (result == AuthorizationResult.SUCCESS) {
-      String nickname = fxml.LOGIN_AREA.getText();
-      Client.setNickname(nickname);
-      PlayScene.getInstance().nickname.setText(
-        PlayScene.getInstance().nickname.getText().replace("%name%", nickname));
+      Client.setNickname(fxml.LOGIN_AREA.getText());
       Launcher.hide();
       Launcher.showPlayScene();
     } else if (result == AuthorizationResult.DENY_LOGIN) {
-      fxml.showError("Данного пользователя не существует");
+      fxml.showError("Пользователя не существует");
     } else if (result == AuthorizationResult.DENY_PASSWORD) {
       fxml.showError("Пароль неверный");
     } else if (result == AuthorizationResult.TOO_MANY_ATTEMPTS) {

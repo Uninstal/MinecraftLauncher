@@ -1,6 +1,9 @@
 package org.uninstal.client;
 
 import org.uninstal.client.connection.Connection;
+import org.uninstal.client.fxml.AuthScene;
+import org.uninstal.client.fxml.PlayScene;
+import org.uninstal.client.util.Strings;
 
 public class Client {
   
@@ -14,13 +17,18 @@ public class Client {
     connection.tryConnect(connected -> {
       if (connected) {
         System.out.println("Successfully connected with " + connection.getAttempts() + " attempts");
+        AuthScene.getInstance().hideText();
         connection.runThread();
+      } else {
+        AuthScene.getInstance().showStatus("Подключение" 
+          + Strings.repeat(".", (connection.getAttempts() + 1) % 3 + 1));
       }
     });
   }
 
   public static void setNickname(String nickname) {
     Client.nickname = nickname;
+    PlayScene.getInstance().setNickname(nickname);
   }
 
   public static String getNickname() {

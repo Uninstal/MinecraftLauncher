@@ -11,9 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class PacketClientResourses extends Packet implements PacketSentable {
+public class PacketClientResources extends Packet implements PacketSentable {
   
-  public PacketClientResourses(Connection connection) {
+  public PacketClientResources(Connection connection) {
     super(connection, PacketType.CLIENT_RESOURCES);
   }
   
