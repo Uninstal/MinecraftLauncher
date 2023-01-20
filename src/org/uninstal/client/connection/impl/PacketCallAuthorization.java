@@ -38,6 +38,7 @@ public class PacketCallAuthorization extends Packet implements PacketSentable {
     else if (password.isEmpty())
       AuthScene.getInstance().showError("Введите пароль");
     else {
+      AuthScene.getInstance().LOGIN_BUTTON.setDisable(true);
       output.writeUTF(login);
       output.writeUTF(password);
       output.flush();

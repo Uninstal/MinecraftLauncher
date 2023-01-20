@@ -39,6 +39,7 @@ public class PacketAuthorizationResult extends Packet implements PacketReceivabl
       Client.setNickname(fxml.LOGIN_AREA.getText());
       Launcher.hide();
       Launcher.showPlayScene();
+      return;
     } else if (result == AuthorizationResult.DENY_LOGIN) {
       fxml.showError("Пользователя не существует");
     } else if (result == AuthorizationResult.DENY_PASSWORD) {
@@ -46,5 +47,6 @@ public class PacketAuthorizationResult extends Packet implements PacketReceivabl
     } else if (result == AuthorizationResult.TOO_MANY_ATTEMPTS) {
       fxml.showError("Слишком много попыток авторизации, попробуйте через 3 минуты...");
     }
+    fxml.LOGIN_BUTTON.setDisable(false);
   }
 }

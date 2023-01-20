@@ -35,7 +35,7 @@ public class Launcher extends Application {
     // BufferedImage image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
     // ImageIO.write(image, "png", new File(Paths.getHomeLocation() + "/screenshot.png"));
     
-    // Избегание завершения потока сцен.
+    // Избегание завершения потока сцен при их смене.
     Platform.setImplicitExit(false);
     
     stage = primaryStage;
@@ -74,7 +74,7 @@ public class Launcher extends Application {
       minecraft.launch();
     }
   }
-  
+
   public static void hide() {
     Platform.runLater(() -> stage.hide());
   }
