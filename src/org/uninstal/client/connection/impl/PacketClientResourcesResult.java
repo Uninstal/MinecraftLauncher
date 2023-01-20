@@ -23,6 +23,7 @@ public class PacketClientResourcesResult extends Packet implements PacketReceiva
     try {
       ClientResourcesResult result = ClientResourcesResult.valueOf(resultString);
       if (result == ClientResourcesResult.VALID) {
+        PlayScene.getInstance().hideText();
         Launcher.launchMinecraft(Client.getNickname());
         Launcher.hide();
       } else if (result == ClientResourcesResult.BAD) {
@@ -31,7 +32,7 @@ public class PacketClientResourcesResult extends Packet implements PacketReceiva
         PlayScene.getInstance().showStatus("Обновление клиента...");
       }
     } catch(IllegalArgumentException e) {
-      PlayScene.getInstance().showError("Ошибка проверки клиента: " + resultString);
+      PlayScene.getInstance().showError("Неверный тип результата: " + resultString);
     }
   }
 }
