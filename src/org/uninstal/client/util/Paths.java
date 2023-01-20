@@ -12,33 +12,64 @@ import java.util.Objects;
 
 public class Paths {
 
-  //C:/Program Files/Java Projects/saves 4/Launcher/out/production/Client
-  private static String HOME;
-  
+  private  static String HOME;
+
   static {
     try {
-      HOME = Client.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+      HOME = Client.class.getProtectionDomain().getCodeSource().getLocation().getPath();
       HOME = HOME.substring(0, HOME.lastIndexOf("/"));
     } catch(Exception e) {
       e.printStackTrace();
     }
   }
 
-  public static String getHomeLocation() {
+  public static String getDefaultLocation() {
     return HOME;
   }
-  
+
+  /**
+   * Данный метод возвращает файл, находящийся в папке jar-файла.
+   * @param fileName название файла вместе с его расширением.
+   * @return возвращает объект файла, но не создает сам файл.
+   */
+  public static File getResourceFile(String fileName) {
+    return new File(HOME, fileName);
+  }
+
+  /**
+   * Данный метод возвращает файл, находящийся в папке jar-файл + папка(и) folder
+   * @param folder папка файла (разделитель - '/').
+   * @param fileName название файла вместе с его расширением.
+   * @return возвращает объект файла, но не создает сам файл.
+   */
+  public static File getResourceFile(String folder, String fileName) {
+    return new File(HOME + "/" + folder, fileName);
+  }
+
+  /**
+   * Данный метод возвращает файл, потенциально находящийся в папке jar-файл + папка(и) folder
+   * и создает их, если они отсутствуют.
+   * @param folder папка файла (разделитель - '/').
+   * @param fileName название файла вместе с его расширением.
+   * @return возвращает объект файла, но не создает сам файл.
+   */
+  public static File getResourceFileWithDirs(String folder, String fileName) {
+    File file = getResourceFile(folder, fileName);
+    file.getParentFile().mkdirs();
+    return file;
+  }
+
   public static URL getUrl(String path) {
     try {
-      return Objects.requireNonNull(Client.class.getResource(path)).toURI().toURL();
+      URL resource = Client.class.getResource(path);
+      return resource == null ? null : resource.toURI().toURL();
     } catch(Exception e) {
       return null;
     }
   }
 
-  public static List<File> getFiles(String folderPath) {
-    System.out.println(folderPath);
-    return getFiles(new File(folderPath));
+  public static List<File> getFiles(String folder) {
+    return getFiles(new File(folder));
   }
 
   private static List<File> getFiles(File folder) {
@@ -53,7 +84,7 @@ public class Paths {
     } else System.out.println("Folder or files in folder is empty");
     return files;
   }
-  
+
   public static Image getImage(String path) {
     return getIcon(path).getImage();
   }

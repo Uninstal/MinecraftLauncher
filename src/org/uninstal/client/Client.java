@@ -12,8 +12,8 @@ public class Client {
   private static boolean connected;
   
   public static void main() {
-    // connection = new Connection("mc.ndaz.ru", 21111);
-    connection = new Connection("127.0.0.1", 25565);
+    connection = new Connection("mc.ndaz.ru", 21111);
+    // connection = new Connection("127.0.0.1", 25565);
     connection.tryConnect(connected -> {
       if (connected) {
         System.out.println("Successfully connected with " + connection.getAttempts() + " attempts");

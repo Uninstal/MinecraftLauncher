@@ -19,11 +19,19 @@ public class PacketClientResourcesResult extends Packet implements PacketReceiva
 
   @Override
   public void receive(DataInputStream input) throws IOException {
-    if (input.readBoolean()) {
-      Launcher.launchMinecraft(Client.getNickname());
-      Launcher.hide();
-    } else {
-      PlayScene.getInstance().showError("Ваша сборка повреждена или не является актуальной");
+    String resultString = input.readUTF();
+    try {
+      ClientResourcesResult result = ClientResourcesResult.valueOf(resultString);
+      if (result == ClientResourcesResult.VALID) {
+        Launcher.launchMinecraft(Client.getNickname());
+        Launcher.hide();
+      } else if (result == ClientResourcesResult.BAD) {
+        PlayScene.getInstance().showError("Ваша сборка повреждена или не является актуальной");
+      } else if (result == ClientResourcesResult.UPDATE) {
+        PlayScene.getInstance().showStatus("Обновление клиента...");
+      }
+    } catch(IllegalArgumentException e) {
+      PlayScene.getInstance().showError("Ошибка проверки клиента: " + resultString);
     }
   }
 }

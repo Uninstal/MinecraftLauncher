@@ -4,6 +4,7 @@ import org.uninstal.client.connection.Connection;
 import org.uninstal.client.connection.Packet;
 import org.uninstal.client.connection.PacketReceivable;
 import org.uninstal.client.connection.PacketType;
+import org.uninstal.client.connection.download.DownloadProcessType;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -17,8 +18,11 @@ public class PacketDownloadProcessImpl extends Packet implements PacketReceivabl
 
   @Override
   public void receive(DataInputStream input) throws IOException {
-    int proccessId = input.readInt();
-    int totalFiles = input.readInt();
-    getConnection().createDownloadProccess(proccessId, totalFiles);
+    getConnection().createDownloadProccess(
+      input.readInt(), 
+      DownloadProcessType.valueOf(input.readUTF()),
+      input.readInt(), 
+      input.readBoolean()
+    );
   }
 }

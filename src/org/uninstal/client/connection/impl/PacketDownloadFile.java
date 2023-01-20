@@ -18,13 +18,7 @@ public class PacketDownloadFile extends Packet implements PacketReceivable {
   
   @Override
   public void receive(DataInputStream input) throws IOException {
-    int processId = input.readInt();
-    DownloadProcess process = Client.getConnection().getDownloadProcess(processId);
-    
-    if (process != null) {
-      String folder = input.readUTF();
-      String fileName = input.readUTF();
-      process.buildFile(input, folder, fileName);
-    }
+    DownloadProcess process = Client.getConnection().getDownloadProcess(input.readInt());
+    if (process != null) process.buildFile(input, input.readUTF(), input.readUTF());
   }
 }

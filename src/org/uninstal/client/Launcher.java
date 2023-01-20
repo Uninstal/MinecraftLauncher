@@ -68,7 +68,7 @@ public class Launcher extends Application {
     Client.main();
   }
   
-  public static synchronized void launchMinecraft(String nickname) {
+  public static void launchMinecraft(String nickname) {
     if (!isMinecraftLaunched()) {
       minecraft = new Minecraft(nickname);
       minecraft.launch();
@@ -102,6 +102,7 @@ public class Launcher extends Application {
   public static void showPlayScene() {
     Platform.runLater(() -> {
       stage.setScene(playScene);
+      stage.sizeToScene();
       stage.show();
     });
   }

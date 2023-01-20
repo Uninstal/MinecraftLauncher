@@ -2,6 +2,8 @@ package org.uninstal.client.connection;
 
 import org.uninstal.client.Launcher;
 import org.uninstal.client.connection.download.DownloadProcess;
+import org.uninstal.client.connection.download.DownloadProcessType;
+import org.uninstal.client.connection.download.DownloadProcessUpdate;
 import org.uninstal.client.connection.impl.*;
 
 import java.io.*;
@@ -93,8 +95,11 @@ public class Connection {
     return downloadProcessMap.get(id);
   }
   
-  public void createDownloadProccess(int id, int totalFiles) {
-    downloadProcessMap.put(id, new DownloadProcess(id, totalFiles));
+  public void createDownloadProccess(int id, DownloadProcessType type, int total, boolean replace) {
+    DownloadProcess process;
+    if (type == DownloadProcessType.UPDATE) process = new DownloadProcessUpdate(id, total, replace);
+    else process = new DownloadProcess(id, total, replace);
+    downloadProcessMap.put(id, process);
   }
   
   public void downDownloadProccess(int id) {
@@ -106,8 +111,11 @@ public class Connection {
     try {
       if (!(packet instanceof PacketSentable))
         throw new IllegalArgumentException("Packet " + packet + " is not sentable");
-      output.writeUTF(packet.getType().getName());
-      ((PacketSentable) packet).send(output);
+      PacketSentable sent = (PacketSentable) packet;
+      if (!sent.isCancelled()) {
+        output.writeUTF(packet.getType().getName());
+        ((PacketSentable) packet).send(output);
+      }
     } catch(IOException e) {
       disconnect();
     }

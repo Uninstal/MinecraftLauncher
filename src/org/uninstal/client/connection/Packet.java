@@ -20,6 +20,6 @@ public class Packet {
 
   @Override
   public String toString() {
-    return "[type=" + packetType.getName() + "]";
+    return "Packet[type=" + packetType.getName() + "]";
   }
 }

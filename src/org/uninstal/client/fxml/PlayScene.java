@@ -12,6 +12,7 @@ import org.uninstal.client.connection.impl.PacketClientResources;
 public class PlayScene {
   
   public static PlayScene instance;
+  private long lock = System.currentTimeMillis();
   
   public AnchorPane PANE;
   public Button PLAY_BUTTON;
@@ -23,7 +24,16 @@ public class PlayScene {
   void initialize() {
     instance = this;
     
-    PLAY_BUTTON.setOnAction(event -> Client.getConnection().sendPacket(new PacketClientResources(Client.getConnection())));
+    PLAY_BUTTON.setOnAction(event -> {
+      if (!Client.isConnected()) {
+        showError("Отсутствует подключение к серверу авторизации...");
+        lock(5000L);
+        return;
+      }
+      
+      showStatus("Проверка клиента игры...");
+      Client.getConnection().sendPacket(new PacketClientResources(Client.getConnection()));
+    });
   }
 
   public static PlayScene getInstance() {
@@ -35,19 +45,27 @@ public class PlayScene {
   }
 
   public synchronized void showError(String text) {
-    Platform.runLater(() -> {
-      ERROR_AREA.setTextFill(Color.RED);
-      ERROR_AREA.setText(text);
-      ERROR_AREA.setVisible(true);
-    });
+    if (lock < System.currentTimeMillis()) {
+      Platform.runLater(() -> {
+        ERROR_AREA.setTextFill(Color.RED);
+        ERROR_AREA.setText(text);
+        ERROR_AREA.setVisible(true);
+      });
+    }
   }
 
   public synchronized void showStatus(String text) {
-    Platform.runLater(() -> {
-      ERROR_AREA.setTextFill(Color.WHITE);
-      ERROR_AREA.setText(text);
-      ERROR_AREA.setVisible(true);
-    });
+    if (lock < System.currentTimeMillis()) {
+      Platform.runLater(() -> {
+        ERROR_AREA.setTextFill(Color.WHITE);
+        ERROR_AREA.setText(text);
+        ERROR_AREA.setVisible(true);
+      });
+    }
+  }
+  
+  public synchronized void lock(long millis) {
+    this.lock = System.currentTimeMillis() + millis;
   }
 
   public synchronized void hideText() {

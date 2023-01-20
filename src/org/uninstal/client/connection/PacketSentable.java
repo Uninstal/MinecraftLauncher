@@ -7,4 +7,8 @@ import java.io.OutputStream;
 public interface PacketSentable {
   
   void send(DataOutputStream output) throws IOException;
+  
+  default boolean isCancelled() {
+    return false;
+  }
 }

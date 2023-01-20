@@ -27,7 +27,7 @@
       <Button fx:id="PLAY_BUTTON" layoutX="139.0" layoutY="119.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="79.0"
               style="-fx-background-color: #0000004f; -fx-text-fill: #FFF;" text="Играть"/>
       <Label fx:id="ERROR_AREA" alignment="TOP_CENTER" layoutX="6.0" layoutY="205.0" prefHeight="17.0" prefWidth="261.0"
-             text="Системные сообщения здесь..." textAlignment="CENTER" textFill="WHITE" wrapText="true" lineSpacing="1">
+             text="Системные сообщения здесь..." textAlignment="CENTER" textFill="WHITE" wrapText="true" lineSpacing="1.0">
          <font>
             <Font name="Consolas Bold" size="12.0"/>
          </font>

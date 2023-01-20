@@ -5,8 +5,9 @@ import org.uninstal.client.util.Paths;
 
 public class Minecraft {
 
-  private MinecraftMonitor monitor;
+  private final String home = Paths.getDefaultLocation();
   private final String nickname;
+  private MinecraftMonitor monitor;
   
   public Minecraft(String nickname) {
     this.nickname = nickname;
@@ -47,8 +48,7 @@ public class Minecraft {
   }
   
   private void appendMainArguments(MinecraftProcessBuilder b) {
-    String path = Paths.getHomeLocation() + "/";
-    path = path.substring(1);
+    String path = (home + "/");
     b.append("java");
     b.append("-Xms2048M");
     b.append("-Xmx2048M");
@@ -57,7 +57,6 @@ public class Minecraft {
   }
   
   private void appendClasspath(MinecraftProcessBuilder b) {
-    String path = Paths.getHomeLocation() + "/";
     String cp = "libraries/com/mojang/authlib/1.5.25/authlib-1.5.25.jar;" +
       "libraries/com/turikhay/ca-fixer/1.0/ca-fixer-1.0.jar;" +
       "libraries/net/minecraftforge/forge/1.12.2-14.23.5.2860/forge-1.12.2-14.23.5.2860.jar;" +
@@ -111,16 +110,15 @@ public class Minecraft {
       "libraries/org/lwjgl/lwjgl/lwjgl_util/2.9.4-nightly-20150209/lwjgl_util-2.9.4-nightly-20150209.jar;" +
       "libraries/com/mojang/text2speech/1.10.3/text2speech-1.10.3.jar;" +
       "versions/ForgeOptiFine 1.12.2/ForgeOptiFine 1.12.2.jar";
-    b.append("-cp").append(path + cp.replace(";", ";" + path));
+    b.append("-cp").append(home + "/" + cp.replace(";", ";" + home + "/"));
   }
   
   private void appendMinecraftArguments(MinecraftProcessBuilder b) {
-    String path = Paths.getHomeLocation();
     b.append("net.minecraft.launchwrapper.Launch");
     b.append("--username").append(nickname);
     b.append("--version").append("ForgeOptiFine 1.12.2");
-    b.append("--gameDir").append(path);
-    b.append("--assetsDir").append(path + "/assets");
+    b.append("--gameDir").append(home);
+    b.append("--assetsDir").append(home + "/assets");
     b.append("--assetIndex").append("1.12");
     b.append("--accessToken").append("[vk.cc/7iPiB9]");
     b.append("--tweakClass").append("net.minecraftforge.fml.common.launcher.FMLTweaker");

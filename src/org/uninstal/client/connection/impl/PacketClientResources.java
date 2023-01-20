@@ -19,12 +19,14 @@ public class PacketClientResources extends Packet implements PacketSentable {
   
   @Override
   public void send(DataOutputStream output) throws IOException {
-    String home = Paths.getHomeLocation();
+    String home = Paths.getDefaultLocation();
     List<File> files = Paths.getFiles(home);
+    System.out.println(files.size());
     
     output.writeInt(files.size());
     for (File file : files) {
-      String folder = file.getParent().length() < home.length() ? "" : file.getParent().substring(home.length());
+      String folder = file.getParent().length() <= home.length()
+        ? "" : file.getParent().substring(home.length()).replace("\\", "/");
       output.writeUTF(folder);
       output.writeUTF(file.getName());
       output.writeLong(file.length());
