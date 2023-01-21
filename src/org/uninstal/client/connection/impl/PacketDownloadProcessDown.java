@@ -17,6 +17,6 @@ public class PacketDownloadProcessDown extends Packet implements PacketReceivabl
 
   @Override
   public void receive(DataInputStream input) throws IOException {
-    getConnection().downDownloadProccess(input.readInt());
+    connection.downDownloadProccess(input.readInt());
   }
 }

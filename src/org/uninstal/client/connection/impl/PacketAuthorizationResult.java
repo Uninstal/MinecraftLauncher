@@ -2,6 +2,7 @@ package org.uninstal.client.connection.impl;
 
 import org.uninstal.client.Client;
 import org.uninstal.client.Launcher;
+import org.uninstal.client.LauncherProperties;
 import org.uninstal.client.connection.Connection;
 import org.uninstal.client.connection.Packet;
 import org.uninstal.client.connection.PacketReceivable;
@@ -37,6 +38,8 @@ public class PacketAuthorizationResult extends Packet implements PacketReceivabl
     AuthScene fxml = AuthScene.getInstance();
     if (result == AuthorizationResult.SUCCESS) {
       Client.setNickname(fxml.LOGIN_AREA.getText());
+      LauncherProperties.setLogin(fxml.LOGIN_AREA.getText());
+      LauncherProperties.setPassword(fxml.PASSWORD_AREA.getText());
       Launcher.hide();
       Launcher.showPlayScene();
       return;

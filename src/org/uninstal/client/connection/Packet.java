@@ -2,8 +2,8 @@ package org.uninstal.client.connection;
 
 public class Packet {
   
-  private final Connection connection;
-  private final PacketType packetType;
+  protected final Connection connection;
+  protected final PacketType packetType;
 
   public Packet(Connection connection, PacketType packetType) {
     this.connection = connection;

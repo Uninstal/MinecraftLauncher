@@ -1,6 +1,7 @@
 package org.uninstal.client;
 
 import org.uninstal.client.connection.Connection;
+import org.uninstal.client.connection.impl.PacketCallAuthorization;
 import org.uninstal.client.fxml.AuthScene;
 import org.uninstal.client.fxml.PlayScene;
 import org.uninstal.client.util.Strings;
@@ -19,6 +20,15 @@ public class Client {
         System.out.println("Successfully connected with " + connection.getAttempts() + " attempts");
         AuthScene.getInstance().hideText();
         connection.runThread();
+        
+        if (LauncherProperties.hasAuthorizationData()) {
+          String login = LauncherProperties.getLogin();
+          String password = LauncherProperties.getPassword();
+          AuthScene.getInstance().LOGIN_AREA.setText(login);
+          AuthScene.getInstance().PASSWORD_AREA.setText(password);
+          connection.sendPacket(new PacketCallAuthorization(connection, login, password));
+        }
+        
       } else {
         AuthScene.getInstance().showStatus("Подключение" 
           + Strings.repeat(".", (connection.getAttempts() + 1) % 3 + 1));

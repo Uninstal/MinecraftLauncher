@@ -14,6 +14,7 @@ import org.uninstal.client.minecraft.Minecraft;
 import org.uninstal.client.util.Paths;
 
 import java.awt.*;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 
@@ -37,6 +38,9 @@ public class Launcher extends Application {
     
     // Избегание завершения потока сцен при их смене.
     Platform.setImplicitExit(false);
+    
+    // Загрузка конфига лаунчера.
+    LauncherProperties.load(Paths.getResourceFile("launcher.properties"));
     
     stage = primaryStage;
     URL authSceneURL = Paths.getUrl("/assets/auth.fxml");
@@ -64,6 +68,11 @@ public class Launcher extends Application {
     primaryStage.setOnCloseRequest(e -> {
       Client.getConnection().disconnect();
       Platform.exit();
+      try {
+        LauncherProperties.save(Paths.getResourceFile("launcher.properties"));
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
     });
     Client.main();
   }
